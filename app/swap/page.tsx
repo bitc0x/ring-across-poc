@@ -9,7 +9,8 @@ import {
   CHAINS, TOKENS, SOURCE_CHAINS, DEST_CHAINS,
   tokenForChain, tokenDecimals, tokensOnChain, fetchSwapQuote,
   formatTokenAmount, formatFillTime,
-  totalFeePct, isSponsored, needsApproval, buildApprovalCalldata, friendlyError,
+  totalFeePct, totalFeeUsd, formatFeeUsd, isSponsored,
+  needsApproval, buildApprovalCalldata, friendlyError,
   type SwapQuote,
 } from "@/lib/across";
 import { parseUnits } from "viem";
@@ -441,9 +442,13 @@ function CrossChainCard() {
                     FREE · SPONSORED
                   </span>
                 </div>
-              ) : (
-                <DetailRow label="Total fee" value={`${totalFeePct(quote).toFixed(4)}%`} />
-              )}
+              ) : (() => {
+                const feeUsd = totalFeeUsd(quote);
+                const value = feeUsd !== null
+                  ? formatFeeUsd(feeUsd)
+                  : `${totalFeePct(quote).toFixed(4)}%`;
+                return <DetailRow label="Total fee" value={value} />;
+              })()}
               <DetailRow label="Route" value={`${CHAINS[sellChain].name} → ${CHAINS[buyChain].name}`} />
             </div>
           )}

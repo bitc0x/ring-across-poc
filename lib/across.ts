@@ -200,6 +200,42 @@ export function totalFeePct(quote: SwapQuote): number {
   return 0;
 }
 
+// Stable-coin symbols, used for the USD fallback when the API doesn't return
+// fees.total.amountUsd. For these, 1 token ≈ $1, so token-units diff ≈ USD diff.
+const STABLE_SYMBOLS = new Set([
+  "USDC", "USDT", "DAI", "BUSD", "FRAX", "TUSD",
+  "USDC-SPOT", "USDT-SPOT", "USDH", "USDT0", "USDM", "USDB",
+]);
+
+export function totalFeeUsd(quote: SwapQuote): number | null {
+  // Preferred: API tells us the USD amount directly
+  const amountUsd = quote.fees?.total?.amountUsd;
+  if (amountUsd !== undefined && amountUsd !== null) {
+    const parsed = parseFloat(String(amountUsd));
+    if (!isNaN(parsed)) return parsed;
+  }
+  // Fallback: derive USD from input/output token diff.
+  // Confident for stable inputs (~$1 each); skipped for non-stables since we
+  // don't have a price oracle handy.
+  try {
+    const inSym = (quote.inputToken?.symbol || "").toUpperCase();
+    if (!STABLE_SYMBOLS.has(inSym)) return null;
+    const inVal = Number(BigInt(quote.inputAmount)) / 10 ** quote.inputToken.decimals;
+    const outVal = Number(BigInt(quote.expectedOutputAmount)) / 10 ** quote.outputToken.decimals;
+    return Math.max(0, inVal - outVal);
+  } catch {
+    return null;
+  }
+}
+
+export function formatFeeUsd(usd: number): string {
+  if (usd <= 0) return "$0.00";
+  if (usd >= 1) return `$${usd.toFixed(2)}`;
+  if (usd >= 0.01) return `$${usd.toFixed(3)}`;
+  if (usd >= 0.001) return `$${usd.toFixed(4)}`;
+  return "<$0.001";
+}
+
 export function isSponsored(quote: SwapQuote): boolean {
   // Only treat as sponsored when the API explicitly says fees.total.pct === 0.
   // Absent fees field != sponsored (it's just a route shape that omits the field).
