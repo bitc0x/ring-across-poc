@@ -9,7 +9,7 @@ import {
   CHAINS, TOKENS, SOURCE_CHAINS, DEST_CHAINS,
   tokenForChain, tokenDecimals, tokensOnChain, fetchSwapQuote,
   formatTokenAmount, formatFillTime,
-  bridgeFeePct, needsApproval, buildApprovalCalldata,
+  totalFeePct, needsApproval, buildApprovalCalldata,
   type SwapQuote,
 } from "@/lib/across";
 import { parseUnits } from "viem";
@@ -324,8 +324,8 @@ function CrossChainCard() {
     setBuySymbol(sellSymbol);
   }
 
-  const outputAmount = quote && buyToken
-    ? formatTokenAmount(quote.expectedOutputAmount, tokenDecimals(buySymbol, buyChain), 4)
+  const outputAmount = quote
+    ? formatTokenAmount(quote.expectedOutputAmount, quote.outputToken.decimals, 4)
     : "0";
 
   const buttonState = (() => {
@@ -339,7 +339,11 @@ function CrossChainCard() {
     if (phase === "depositing") return { label: "Depositing...", disabled: true, action: () => {} };
     if (phase === "filling") return { label: "Routing across relayers...", disabled: true, action: () => {} };
     if (phase === "complete") return { label: "Swap complete · New swap", disabled: false, action: () => { setPhase("idle"); setAmount(""); setQuote(null); } };
-    return { label: `Swap to ${CHAINS[buyChain].shortName}`, disabled: false, action: execute };
+    const destChainName = CHAINS[buyChain].name;
+    const ctaLabel = sellSymbol === buySymbol
+      ? `Bridge ${sellSymbol} to ${destChainName}`
+      : `Swap to ${buySymbol} on ${destChainName}`;
+    return { label: ctaLabel, disabled: false, action: execute };
   })();
 
   return (
@@ -398,9 +402,9 @@ function CrossChainCard() {
           {quote && !quoting && (
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 16px" }}>
               <DetailRow label="Fill time" value={formatFillTime(quote.expectedFillTime)} highlight />
-              <DetailRow label="Min received" value={`${formatTokenAmount(quote.minOutputAmount, tokenDecimals(buySymbol, buyChain), 4)} ${buySymbol}`} />
-              <DetailRow label="Bridge fee" value={`${bridgeFeePct(quote).toFixed(4)}%`} />
-              <DetailRow label="Route" value={`${CHAINS[sellChain].shortName} → ${CHAINS[buyChain].shortName}`} />
+              <DetailRow label="Min received" value={`${formatTokenAmount(quote.minOutputAmount, quote.outputToken.decimals, 4)} ${buySymbol}`} />
+              <DetailRow label="Total fee" value={`${totalFeePct(quote).toFixed(4)}%`} />
+              <DetailRow label="Route" value={`${CHAINS[sellChain].name} → ${CHAINS[buyChain].name}`} />
             </div>
           )}
         </div>

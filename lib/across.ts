@@ -225,10 +225,10 @@ export function formatFillTime(seconds: number): string {
   return `~${mins}m ${seconds % 60}s`;
 }
 
-export function bridgeFeePct(quote: SwapQuote): number {
-  const bridgeFees = quote.steps.bridge?.fees;
-  if (bridgeFees?.pct) {
-    return (parseFloat(bridgeFees.pct) / 1e18) * 100;
+export function totalFeePct(quote: SwapQuote): number {
+  const total = quote.fees?.total;
+  if (total?.pct) {
+    return (parseFloat(total.pct) / 1e18) * 100;
   }
   return 0;
 }
