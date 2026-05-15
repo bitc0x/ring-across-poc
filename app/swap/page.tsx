@@ -174,8 +174,7 @@ function CrossChainCard() {
   const publicClient = usePublicClient();
 
   const [sellChain, setSellChain] = useState(42161);
-  const [buyChain, setBuyChain] = useState(999);
-  const [sellSymbol, setSellSymbol] = useState("USDC");
+  const [buyChain, setBuyChain] = useState(999);  const [sellSymbol, setSellSymbol] = useState("USDC");
   const [buySymbol, setBuySymbol] = useState("USDC");
   const [amount, setAmount] = useState("");
   const [quote, setQuote] = useState<SwapQuote | null>(null);
@@ -289,7 +288,13 @@ function CrossChainCard() {
           data: calldata,
           chainId: sellChain,
         });
-        await publicClient.waitForTransactionReceipt({ hash });
+        // Wait for approval to be mined, with timeout so we don't hang on flaky RPCs.
+        try {
+          await publicClient.waitForTransactionReceipt({ hash, timeout: 30_000 });
+        } catch {
+          // RPC may be slow but the tx is on-chain. Brief grace period and proceed.
+          await new Promise((r) => setTimeout(r, 4_000));
+        }
       }
 
       if (!quote.swapTx) throw new Error("No swap tx in quote");
@@ -302,11 +307,19 @@ function CrossChainCard() {
         chainId: sellChain,
       });
       setOriginTx(txHash);
-      setTxMessage(`Submitted. Waiting for confirmation on ${CHAINS[sellChain].name}...`);
-      await publicClient.waitForTransactionReceipt({ hash: txHash });
 
+      // Advance to filling phase immediately. Across status polling detects the
+      // deposit from chain state directly, we don't need to wait for the receipt
+      // to be returned by the wallet's RPC (which can hang on flaky providers).
       setPhase("filling");
-      setTxMessage("Routing across the relayer network...");
+      setTxMessage(`Submitted to ${CHAINS[sellChain].name}. Routing across relayers...`);
+
+      // Best-effort receipt wait in the background for slightly better UX timing;
+      // never blocks the status flow.
+      publicClient
+        .waitForTransactionReceipt({ hash: txHash, timeout: 30_000 })
+        .catch(() => {});
+
       await pollStatus(txHash, sellChain);
     } catch (e: any) {
       setPhase("error");
