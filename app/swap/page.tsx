@@ -9,7 +9,7 @@ import {
   CHAINS, TOKENS, SOURCE_CHAINS, DEST_CHAINS,
   tokenForChain, tokenDecimals, tokensOnChain, fetchSwapQuote,
   formatTokenAmount, formatFillTime,
-  totalFeePct, needsApproval, buildApprovalCalldata,
+  totalFeePct, isSponsored, needsApproval, buildApprovalCalldata, friendlyError,
   type SwapQuote,
 } from "@/lib/across";
 import { parseUnits } from "viem";
@@ -189,8 +189,6 @@ function CrossChainCard() {
 
   const sellTokenAddr = useMemo(() => tokenForChain(sellSymbol, sellChain), [sellSymbol, sellChain]);
   const buyTokenAddr = useMemo(() => tokenForChain(buySymbol, buyChain), [buySymbol, buyChain]);
-  const sellToken = TOKENS[sellSymbol];
-  const buyToken = TOKENS[buySymbol];
 
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
   useEffect(() => {
@@ -219,12 +217,12 @@ function CrossChainCard() {
         });
         setQuote(q);
       } catch (e: any) {
+        let raw = e?.message || "Quote failed";
         try {
-          const parsed = JSON.parse(e.message);
-          setQuoteError(parsed.message || parsed.error || "Quote failed");
-        } catch {
-          setQuoteError(e.message || "Quote failed");
-        }
+          const parsed = JSON.parse(raw);
+          raw = parsed.message || parsed.error || raw;
+        } catch {}
+        setQuoteError(friendlyError(raw));
       } finally {
         setQuoting(false);
       }
@@ -362,14 +360,25 @@ function CrossChainCard() {
       />
 
       <div style={{ display: "flex", justifyContent: "center", margin: "-8px 0", position: "relative", zIndex: 2 }}>
-        <button onClick={flip} style={{
-          width: 36, height: 36, background: "var(--bg-elev)",
-          border: "3px solid var(--bg-card)", borderRadius: 10,
-          display: "flex", alignItems: "center", justifyContent: "center",
-          color: "var(--text-2)",
-        }}>
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M7 2v10M3 8l4 4 4-4"/></svg>
-        </button>
+        {(() => {
+          const canFlip = SOURCE_CHAINS.includes(buyChain) && DEST_CHAINS.includes(sellChain);
+          return (
+            <button
+              onClick={flip}
+              disabled={!canFlip}
+              title={canFlip ? "Reverse direction" : "This route can't be flipped (destination-only chain)"}
+              style={{
+                width: 36, height: 36, background: "var(--bg-elev)",
+                border: "3px solid var(--bg-card)", borderRadius: 10,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                color: canFlip ? "var(--text-2)" : "var(--text-3)",
+                opacity: canFlip ? 1 : 0.4,
+                cursor: canFlip ? "pointer" : "not-allowed",
+              }}>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M7 2v10M3 8l4 4 4-4"/></svg>
+            </button>
+          );
+        })()}
       </div>
 
       <TokenBox
@@ -403,7 +412,23 @@ function CrossChainCard() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 16px" }}>
               <DetailRow label="Fill time" value={formatFillTime(quote.expectedFillTime)} highlight />
               <DetailRow label="Min received" value={`${formatTokenAmount(quote.minOutputAmount, quote.outputToken.decimals, 4)} ${buySymbol}`} />
-              <DetailRow label="Total fee" value={`${totalFeePct(quote).toFixed(4)}%`} />
+              {isSponsored(quote) ? (
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{ color: "var(--text-3)", fontSize: 12 }}>Total fee</span>
+                  <span style={{
+                    display: "inline-flex", alignItems: "center", gap: 5,
+                    fontSize: 11, fontWeight: 700, letterSpacing: "0.5px",
+                    color: "var(--across-green)",
+                    background: "rgba(109,245,178,0.14)",
+                    border: "1px solid rgba(109,245,178,0.32)",
+                    padding: "3px 8px", borderRadius: 999,
+                  }}>
+                    FREE · SPONSORED
+                  </span>
+                </div>
+              ) : (
+                <DetailRow label="Total fee" value={`${totalFeePct(quote).toFixed(4)}%`} />
+              )}
               <DetailRow label="Route" value={`${CHAINS[sellChain].name} → ${CHAINS[buyChain].name}`} />
             </div>
           )}
@@ -516,7 +541,13 @@ function TokenBox({
         {editable ? (
           <input
             value={amount}
-            onChange={(e) => onAmountChange && onAmountChange(e.target.value.replace(/[^0-9.]/g, ""))}
+            onChange={(e) => {
+              if (!onAmountChange) return;
+              const cleaned = e.target.value
+                .replace(/[^0-9.]/g, "")
+                .replace(/(\..*)\./g, "$1"); // collapse repeat dots, keep first
+              onAmountChange(cleaned);
+            }}
             placeholder="0"
             inputMode="decimal"
             style={{

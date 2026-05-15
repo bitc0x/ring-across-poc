@@ -120,7 +120,7 @@ export type SwapQuote = {
   expectedOutputAmount: string;
   minOutputAmount: string;
   expectedFillTime: number;
-  fees: { total: FeeAmount; totalMax?: FeeAmount; originGas?: FeeAmount };
+  fees?: { total: FeeAmount; totalMax?: FeeAmount; originGas?: FeeAmount };
   swapTx: {
     ecosystem: string;
     simulationSuccess?: boolean;
@@ -182,10 +182,34 @@ export function formatFillTime(seconds: number): string {
 
 export function totalFeePct(quote: SwapQuote): number {
   const total = quote.fees?.total;
-  if (total?.pct) {
-    return (parseFloat(total.pct) / 1e18) * 100;
+  if (total?.pct !== undefined && total.pct !== null) {
+    return (parseFloat(String(total.pct)) / 1e18) * 100;
   }
+  // Fallback when the API omits the fees field (some same-asset routes):
+  // compute implied fee from input vs output values. Works for stables (~$1)
+  // and any same-asset pair. Close approximation for mixed-stable routes.
+  try {
+    const inDec = quote.inputToken.decimals;
+    const outDec = quote.outputToken.decimals;
+    const inVal = Number(BigInt(quote.inputAmount)) / 10 ** inDec;
+    const outVal = Number(BigInt(quote.expectedOutputAmount)) / 10 ** outDec;
+    if (inVal > 0) {
+      return Math.max(0, ((inVal - outVal) / inVal) * 100);
+    }
+  } catch {}
   return 0;
+}
+
+export function isSponsored(quote: SwapQuote): boolean {
+  // Only treat as sponsored when the API explicitly says fees.total.pct === 0.
+  // Absent fees field != sponsored (it's just a route shape that omits the field).
+  const pct = quote.fees?.total?.pct;
+  if (pct === undefined || pct === null) return false;
+  try {
+    return BigInt(String(pct)) === BigInt(0);
+  } catch {
+    return parseFloat(String(pct)) === 0;
+  }
 }
 
 export function needsApproval(quote: SwapQuote): boolean {
@@ -202,6 +226,25 @@ export function buildApprovalCalldata(spender: string, amount: string): `0x${str
   const spenderPadded = spender.toLowerCase().replace("0x", "").padStart(64, "0");
   const amountHex = BigInt(amount).toString(16).padStart(64, "0");
   return `0x${selector}${spenderPadded}${amountHex}` as `0x${string}`;
+}
+
+export function friendlyError(message: string): string {
+  if (!message) return "Quote unavailable";
+  const lc = message.toLowerCase();
+  if (lc.includes("amount_too_low") || lc.includes("too low to cover")) {
+    return "Amount too low to cover network costs. Try a larger amount.";
+  }
+  if (lc.includes("amount_too_high") || lc.includes("exceeds")) {
+    return "Amount exceeds available relayer liquidity. Try a smaller amount.";
+  }
+  if (lc.includes("route") && (lc.includes("not supported") || lc.includes("unsupported"))) {
+    return "This route isn't supported yet.";
+  }
+  if (lc.includes("simulation_error") || lc.includes("simulation failed")) {
+    return "Quote simulation failed. The route may be temporarily unavailable.";
+  }
+  // Strip the verbose "Failed to fetch swap quote: " prefix if it's left over
+  return message.replace(/^Failed to fetch swap quote:\s*/, "").trim() || "Quote unavailable";
 }
 
 // Coverage display: Ring's 4 active chains first, then other Across-supported chains.

@@ -67,7 +67,7 @@ export default function Landing() {
 
       <section style={{ maxWidth: 1200, margin: "40px auto 0", padding: "0 32px" }}>
         <div style={{
-          display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 1,
+          display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 1,
           background: "var(--border-soft)", border: "1px solid var(--border-soft)",
           borderRadius: "var(--radius-lg)", overflow: "hidden",
         }}>
@@ -87,12 +87,12 @@ export default function Landing() {
           Drop the Across Swap API into the existing Swap card. No UX redesign, no separate bridge product. Users sell on Ethereum, buy on Hyperliquid, ship on BSC, all without leaving Ring.
         </p>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 16 }}>
           <Pillar num="01" title="Retention" line="Stop losing users at the bridge."
             body="Today, a user holding USDC on Arbitrum who wants exposure on Hyperliquid has to leave Ring, find a bridge, wait, and rarely comes back. With Across embedded, that flow stays in Ring. Same card, same session, same brand."
             color="#ff5cb3" />
           <Pillar num="02" title="Reach" line="Onboard users from any chain, any asset."
-            body="Your Hyperliquid deployment is sitting on top of one of the most active ecosystems in crypto. Across unlocks native deposits from Ethereum, Arbitrum, Base, Optimism, Polygon, Unichain straight into Ring on Hyperliquid. The users who currently can't reach Ring become addressable overnight."
+            body="Your Hyperliquid deployment is sitting on top of one of the most active ecosystems in crypto. Across unlocks native deposits from Ethereum, Arbitrum, Base, Optimism, and Blast straight into Ring on Hyperliquid. The users who currently can't reach Ring become addressable overnight."
             color="#9d5cff" />
           <Pillar num="03" title="Revenue" line="Monetize every cross-chain swap."
             body="appFee on the Swap API lets Ring take a configurable cut of every cross-chain trade, on top of standard Ring fees. New revenue line, zero engineering on the take-rate side."
@@ -107,7 +107,7 @@ export default function Landing() {
           borderRadius: "var(--radius-lg)",
           padding: 40,
           display: "grid",
-          gridTemplateColumns: "1fr 1fr",
+          gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))",
           gap: 40,
           alignItems: "center",
         }}>
@@ -141,7 +141,7 @@ export default function Landing() {
         <h2 style={{ fontSize: 38, fontWeight: 700, letterSpacing: "-1px", marginBottom: 32 }}>
           The infrastructure under the cross-chain layer.
         </h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12 }}>
           <Feature title="Speed" body="Sub-2 second median fill time across all routes. Fastest in the category." />
           <Feature title="Cost" body="Lowest fees in the category, verifiable on-chain. Users keep more of their swap." />
           <Feature title="Decentralization" body="40+ independent relayers compete to fill. Funds escrowed in audited contracts, settled via UMA optimistic oracle. No single point of failure." />
@@ -175,7 +175,7 @@ export default function Landing() {
               Bridges have lost over $2.9 billion to exploits in the last four years. Across has lost none. Not luck, architecture. Users receive canonical assets, never wrapped representations. Relayers front capital and bear the transfer risk. Settlement is verified by the UMA optimistic oracle. The system stays secure with just one honest participant.
             </p>
             <div style={{
-              display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 0,
+              display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 0,
               borderTop: "1px solid var(--border)",
             }}>
               <SecurityStat value="$35B+" label="Bridged across all chains" />
@@ -196,7 +196,7 @@ export default function Landing() {
           Live benchmark on the routes that matter most to Ring: Ethereum into Hyperliquid, in both stablecoins and stablecoin-to-stablecoin. Across is the lowest cost on every one, and sponsored (free) on USDT to USDC into HyperCore.
         </p>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 16 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(420px, 1fr))", gap: 16 }}>
           <CostCard
             route="USDC · $100"
             from="Ethereum"
@@ -307,7 +307,7 @@ export default function Landing() {
           The leaders of crypto already ship Across.
         </h2>
         <div style={{
-          display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12,
+          display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12,
         }}>
           {PARTNERS.map((p) => (
             <div key={p.name} style={{
@@ -335,7 +335,7 @@ export default function Landing() {
             Read the integration docs →
           </a>
         </p>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))", gap: 12 }}>
           <CredCard
             label="Integrator ID"
             hint="Pass as the integratorId query parameter on every Swap API call."
