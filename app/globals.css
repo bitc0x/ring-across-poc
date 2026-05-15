@@ -1,0 +1,100 @@
+:root {
+  --bg: #0a0a0d;
+  --bg-card: #15151b;
+  --bg-elev: #1c1c24;
+  --bg-input: #20202a;
+  --border: #2a2a36;
+  --border-soft: rgba(255, 255, 255, 0.06);
+  --text: #ffffff;
+  --text-2: #b4b4c0;
+  --text-3: #6d6d7a;
+  --primary: #4f4ff7;
+  --primary-hover: #6464ff;
+  --primary-soft: rgba(79, 79, 247, 0.12);
+  --accent-pink: #ff5cb3;
+  --accent-purple: #9d5cff;
+  --across-green: #6df5b2;
+  --across-green-dark: #2dc878;
+  --success: #22c55e;
+  --warn: #f5a623;
+  --error: #ef4444;
+  --radius: 14px;
+  --radius-sm: 10px;
+  --radius-lg: 20px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+input { font-family: inherit; }
+
+.ring-logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: conic-gradient(from 180deg, #ff5cb3, #c450ff, #6464ff, #4f4ff7, #ff5cb3);
+  position: relative;
+  flex-shrink: 0;
+}
+.ring-logo::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  background: var(--bg);
+  border-radius: 50%;
+}
+
+.ring-text {
+  background: linear-gradient(90deg, #ff5cb3 0%, #9d5cff 50%, #6464ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 600;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  border-radius: 999px;
+  padding: 10px 22px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: background 0.15s;
+}
+.btn-primary:hover { background: var(--primary-hover); }
+
+.btn-ghost {
+  background: var(--bg-elev);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 10px 22px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: background 0.15s;
+}
+.btn-ghost:hover { background: var(--border); }
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-3); }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeIn 0.2s ease-out; }
