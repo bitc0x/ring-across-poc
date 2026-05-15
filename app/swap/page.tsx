@@ -195,7 +195,7 @@ function CrossChainCard() {
     setQuote(null);
     setQuoteError(null);
     if (!amount || !isConnected || !address || !sellTokenAddr || !buyTokenAddr) return;
-    if (sellChain === buyChain && sellSymbol === buySymbol) return;
+    if (sellChain === buyChain) return;
 
     const num = parseFloat(amount);
     if (!num || num <= 0) return;
@@ -328,7 +328,7 @@ function CrossChainCard() {
 
   const buttonState = (() => {
     if (!isConnected) return { label: "Connect wallet", disabled: true, action: () => {} };
-    if (sellChain === buyChain && sellSymbol === buySymbol) return { label: "Select different route", disabled: true, action: () => {} };
+    if (sellChain === buyChain) return { label: "Same-chain swaps not supported", disabled: true, action: () => {} };
     if (!amount || parseFloat(amount) <= 0) return { label: "Enter an amount", disabled: true, action: () => {} };
     if (quoting) return { label: "Fetching quote...", disabled: true, action: () => {} };
     if (quoteError) return { label: "Quote unavailable", disabled: true, action: () => {} };
@@ -356,6 +356,7 @@ function CrossChainCard() {
         onChainChange={setSellChain}
         onSymbolChange={setSellSymbol}
         chainOptions={SOURCE_CHAINS}
+        excludeChainId={buyChain}
         editable
       />
 
@@ -389,6 +390,7 @@ function CrossChainCard() {
         onChainChange={setBuyChain}
         onSymbolChange={setBuySymbol}
         chainOptions={DEST_CHAINS}
+        excludeChainId={sellChain}
         readonly
         muted={!quote}
       />
@@ -506,7 +508,7 @@ function CrossChainCard() {
 }
 
 function TokenBox({
-  label, chainId, symbol, amount, onAmountChange, onChainChange, onSymbolChange, chainOptions, editable, readonly, muted,
+  label, chainId, symbol, amount, onAmountChange, onChainChange, onSymbolChange, chainOptions, excludeChainId, editable, readonly, muted,
 }: {
   label: string;
   chainId: number;
@@ -516,6 +518,7 @@ function TokenBox({
   onChainChange: (id: number) => void;
   onSymbolChange: (s: string) => void;
   chainOptions: number[];
+  excludeChainId?: number;
   editable?: boolean;
   readonly?: boolean;
   muted?: boolean;
@@ -535,7 +538,7 @@ function TokenBox({
     <div style={{ background: "var(--bg-elev)", borderRadius: "var(--radius)", padding: 16, position: "relative" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
         <span style={{ fontSize: 12, color: "var(--text-3)" }}>{label}</span>
-        <ChainPicker chain={chain} open={chainOpen} setOpen={setChainOpen} options={chainOptions} onSelect={onChainChange} />
+        <ChainPicker chain={chain} open={chainOpen} setOpen={setChainOpen} options={chainOptions} excludeId={excludeChainId} onSelect={onChainChange} />
       </div>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
         {editable ? (
@@ -572,8 +575,8 @@ function TokenBox({
   );
 }
 
-function ChainPicker({ chain, open, setOpen, options, onSelect }: {
-  chain: any; open: boolean; setOpen: (b: boolean) => void; options: number[]; onSelect: (id: number) => void;
+function ChainPicker({ chain, open, setOpen, options, excludeId, onSelect }: {
+  chain: any; open: boolean; setOpen: (b: boolean) => void; options: number[]; excludeId?: number; onSelect: (id: number) => void;
 }) {
   if (!chain) return null;
   return (
@@ -595,23 +598,39 @@ function ChainPicker({ chain, open, setOpen, options, onSelect }: {
             position: "absolute", top: "calc(100% + 6px)", right: 0,
             background: "var(--bg-card)", border: "1px solid var(--border)",
             borderRadius: "var(--radius)", padding: 6,
-            minWidth: 180, zIndex: 30, boxShadow: "0 12px 36px rgba(0,0,0,0.5)",
+            minWidth: 220, zIndex: 30, boxShadow: "0 12px 36px rgba(0,0,0,0.5)",
             maxHeight: 320, overflowY: "auto",
           }}>
             {options.map((id) => {
               const c = CHAINS[id];
               if (!c) return null;
+              const isExcluded = id === excludeId;
+              const isSelected = id === chain.id;
               return (
-                <button key={id} onClick={() => { onSelect(id); setOpen(false); }} style={{
-                  width: "100%", padding: "8px 10px", borderRadius: 8,
-                  display: "flex", alignItems: "center", gap: 8,
-                  fontSize: 13, color: "var(--text)",
-                  background: id === chain.id ? "var(--bg-elev)" : "transparent",
-                  textAlign: "left",
-                }}>
+                <button
+                  key={id}
+                  onClick={() => { if (isExcluded) return; onSelect(id); setOpen(false); }}
+                  disabled={isExcluded}
+                  title={isExcluded ? "Same as the other side, pick a different chain" : undefined}
+                  style={{
+                    width: "100%", padding: "8px 10px", borderRadius: 8,
+                    display: "flex", alignItems: "center", gap: 8,
+                    fontSize: 13,
+                    color: isExcluded ? "var(--text-3)" : "var(--text)",
+                    background: isSelected && !isExcluded ? "var(--bg-elev)" : "transparent",
+                    textAlign: "left",
+                    opacity: isExcluded ? 0.4 : 1,
+                    cursor: isExcluded ? "not-allowed" : "pointer",
+                  }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={c.logo} alt={c.name} width={20} height={20} style={{ borderRadius: "50%" }} />
-                  {c.name}
+                  <img src={c.logo} alt={c.name} width={20} height={20} style={{ borderRadius: "50%", filter: isExcluded ? "grayscale(1)" : "none" }} />
+                  <span style={{ flex: 1 }}>{c.name}</span>
+                  {isExcluded && (
+                    <span style={{
+                      fontSize: 9, fontWeight: 600, letterSpacing: "0.3px",
+                      color: "var(--text-3)", textTransform: "uppercase",
+                    }}>in use</span>
+                  )}
                 </button>
               );
             })}
