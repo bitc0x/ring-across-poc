@@ -4,15 +4,21 @@ export type AcrossChain = {
   shortName: string;
   color: string;
   explorer: string;
+  logo: string;
 };
 
+const LOGO_BASE = "https://alexandria-blond.vercel.app/assets/chains";
+
 export const CHAINS: Record<number, AcrossChain> = {
-  1: { id: 1, name: "Ethereum", shortName: "ETH", color: "#627eea", explorer: "https://etherscan.io" },
-  10: { id: 10, name: "Optimism", shortName: "OP", color: "#ff0420", explorer: "https://optimistic.etherscan.io" },
-  42161: { id: 42161, name: "Arbitrum", shortName: "ARB", color: "#28a0f0", explorer: "https://arbiscan.io" },
-  8453: { id: 8453, name: "Base", shortName: "BASE", color: "#0052ff", explorer: "https://basescan.org" },
-  130: { id: 130, name: "Unichain", shortName: "UNI", color: "#f50db4", explorer: "https://uniscan.xyz" },
-  999: { id: 999, name: "HyperEVM", shortName: "HYPE", color: "#97fce4", explorer: "https://hyperevmscan.io" },
+  1:     { id: 1,     name: "Ethereum",    shortName: "ETH",   color: "#627eea", explorer: "https://etherscan.io",            logo: `${LOGO_BASE}/mainnet.svg` },
+  10:    { id: 10,    name: "Optimism",    shortName: "OP",    color: "#ff0420", explorer: "https://optimistic.etherscan.io", logo: `${LOGO_BASE}/optimism.svg` },
+  56:    { id: 56,    name: "BNB Chain",   shortName: "BSC",   color: "#f3ba2f", explorer: "https://bscscan.com",             logo: `${LOGO_BASE}/bsc.svg` },
+  137:   { id: 137,   name: "Polygon",     shortName: "POLY",  color: "#8247e5", explorer: "https://polygonscan.com",         logo: `${LOGO_BASE}/polygon.svg` },
+  130:   { id: 130,   name: "Unichain",    shortName: "UNI",   color: "#f50db4", explorer: "https://uniscan.xyz",             logo: `${LOGO_BASE}/unichain.svg` },
+  42161: { id: 42161, name: "Arbitrum",    shortName: "ARB",   color: "#28a0f0", explorer: "https://arbiscan.io",             logo: `${LOGO_BASE}/arbitrum.svg` },
+  8453:  { id: 8453,  name: "Base",        shortName: "BASE",  color: "#0052ff", explorer: "https://basescan.org",            logo: `${LOGO_BASE}/base.svg` },
+  81457: { id: 81457, name: "Blast",       shortName: "BLAST", color: "#fcfc03", explorer: "https://blastscan.io",            logo: `${LOGO_BASE}/blast.svg` },
+  999:   { id: 999,   name: "HyperEVM",    shortName: "HYPE",  color: "#97fce4", explorer: "https://hyperevmscan.io",         logo: `${LOGO_BASE}/hyperevm.svg` },
 };
 
 export type AcrossToken = {
@@ -20,16 +26,20 @@ export type AcrossToken = {
   name: string;
   decimals: number;
   addresses: Partial<Record<number, string>>;
+  logo: string;
 };
 
 const ZERO = "0x0000000000000000000000000000000000000000";
+const TW = (addr: string) =>
+  `https://github.com/trustwallet/assets/blob/master/blockchains/ethereum/assets/${addr}/logo.png?raw=true`;
 
 export const TOKENS: Record<string, AcrossToken> = {
   ETH: {
     symbol: "ETH",
     name: "Ethereum",
     decimals: 18,
-    addresses: { 1: ZERO, 10: ZERO, 42161: ZERO, 8453: ZERO, 130: ZERO },
+    addresses: { 1: ZERO, 10: ZERO, 42161: ZERO, 8453: ZERO, 130: ZERO, 81457: ZERO },
+    logo: TW("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"),
   },
   WETH: {
     symbol: "WETH",
@@ -41,7 +51,9 @@ export const TOKENS: Record<string, AcrossToken> = {
       42161: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
       8453: "0x4200000000000000000000000000000000000006",
       130: "0x4200000000000000000000000000000000000006",
+      81457: "0x4300000000000000000000000000000000000004",
     },
+    logo: TW("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"),
   },
   USDC: {
     symbol: "USDC",
@@ -50,10 +62,14 @@ export const TOKENS: Record<string, AcrossToken> = {
     addresses: {
       1: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
       10: "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
+      56: "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
       42161: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
       8453: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
       130: "0x078D782b760474a361dDA0AF3839290b0EF57AD6",
+      137: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
+      999: "0xb88339CB7199b77E23DB6E890353E22632Ba630f",
     },
+    logo: TW("0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"),
   },
   USDT: {
     symbol: "USDT",
@@ -62,8 +78,11 @@ export const TOKENS: Record<string, AcrossToken> = {
     addresses: {
       1: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
       10: "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58",
+      56: "0x55d398326f99059fF775485246999027B3197955",
       42161: "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
+      137: "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
     },
+    logo: TW("0xdAC17F958D2ee523a2206206994597C13D831ec7"),
   },
   WBTC: {
     symbol: "WBTC",
@@ -75,6 +94,7 @@ export const TOKENS: Record<string, AcrossToken> = {
       42161: "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f",
       8453: "0x0555E30da8f98308EdB960aa94C0Db47230d2B9c",
     },
+    logo: TW("0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599"),
   },
   DAI: {
     symbol: "DAI",
@@ -85,11 +105,13 @@ export const TOKENS: Record<string, AcrossToken> = {
       10: "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
       42161: "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
     },
+    logo: TW("0x6B175474E89094C44Da98b954EedeAC495271d0F"),
   },
 };
 
-export const SOURCE_CHAINS = [1, 10, 42161, 8453, 130];
-export const DEST_CHAINS = [1, 42161, 8453, 130, 999];
+// Source = where users hold assets. Destination = Ring's 4 active chains plus extras for flex.
+export const SOURCE_CHAINS = [1, 10, 56, 137, 42161, 8453, 130, 81457];
+export const DEST_CHAINS = [1, 56, 42161, 8453, 130, 81457, 999];
 
 export function tokenForChain(symbol: string, chainId: number): string | undefined {
   return TOKENS[symbol]?.addresses[chainId];
@@ -214,3 +236,23 @@ export function buildApprovalCalldata(spender: string, amount: string): `0x${str
   const amountHex = BigInt(amount).toString(16).padStart(64, "0");
   return `0x${selector}${spenderPadded}${amountHex}` as `0x${string}`;
 }
+
+// Coverage display: Ring's 4 active chains first, then other Across-supported chains.
+export const COVERAGE_CHAINS = [
+  { id: 1,     name: "Ethereum",    logo: `${LOGO_BASE}/mainnet.svg`,     onRing: true  },
+  { id: 999,   name: "Hyperliquid", logo: `${LOGO_BASE}/hyperevm.svg`,    onRing: true  },
+  { id: 56,    name: "BNB Chain",   logo: `${LOGO_BASE}/bsc.svg`,         onRing: true  },
+  { id: 81457, name: "Blast",       logo: `${LOGO_BASE}/blast.svg`,       onRing: true  },
+  { id: 42161, name: "Arbitrum",    logo: `${LOGO_BASE}/arbitrum.svg`,    onRing: false },
+  { id: 8453,  name: "Base",        logo: `${LOGO_BASE}/base.svg`,        onRing: false },
+  { id: 10,    name: "Optimism",    logo: `${LOGO_BASE}/optimism.svg`,    onRing: false },
+  { id: -1,    name: "Solana",      logo: `${LOGO_BASE}/solana.svg`,      onRing: false },
+  { id: 137,   name: "Polygon",     logo: `${LOGO_BASE}/polygon.svg`,     onRing: false },
+  { id: 130,   name: "Unichain",    logo: `${LOGO_BASE}/unichain.svg`,    onRing: false },
+  { id: 59144, name: "Linea",       logo: `${LOGO_BASE}/linea.svg`,       onRing: false },
+  { id: 34443, name: "Mode",        logo: `${LOGO_BASE}/mode.svg`,        onRing: false },
+  { id: 1868,  name: "Soneium",     logo: `${LOGO_BASE}/soneium.svg`,     onRing: false },
+  { id: 480,   name: "World",       logo: `${LOGO_BASE}/world-chain.svg`, onRing: false },
+  { id: 57073, name: "Ink",         logo: `${LOGO_BASE}/ink.svg`,         onRing: false },
+  { id: 9745,  name: "Plasma",      logo: `${LOGO_BASE}/plasma.svg`,      onRing: false },
+];

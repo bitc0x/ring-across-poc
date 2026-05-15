@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
+import { COVERAGE_CHAINS } from "@/lib/across";
 
 const PARTNERS = [
   { name: "Circle", color: "#5fbfff" },
@@ -18,18 +20,17 @@ const PARTNERS = [
 export default function Landing() {
   return (
     <main style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)" }}>
-      {/* nav */}
       <nav style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
         padding: "20px 32px", borderBottom: "1px solid var(--border-soft)",
         position: "sticky", top: 0, background: "rgba(10,10,13,0.85)", backdropFilter: "blur(12px)", zIndex: 10,
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div className="ring-logo" />
-          <span className="ring-text" style={{ fontSize: 16 }}>Ring</span>
-          <span style={{ color: "var(--text-3)", fontWeight: 500, fontSize: 14 }}>×</span>
-          <AcrossLogo />
-          <span style={{ fontWeight: 600, fontSize: 16 }}>Across</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <Image src="/ring-logo.png" alt="Ring" width={26} height={26} style={{ borderRadius: 6 }} />
+          <span style={{ fontSize: 16, fontWeight: 600 }}>Ring</span>
+          <span style={{ color: "var(--text-3)", fontSize: 14, margin: "0 2px" }}>×</span>
+          <Image src="/across-logo.png" alt="Across" width={26} height={26} style={{ borderRadius: "50%" }} />
+          <span style={{ fontSize: 16, fontWeight: 600 }}>Across</span>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
           <a href="https://docs.across.to" target="_blank" rel="noreferrer" className="btn-ghost" style={{ padding: "8px 16px", fontSize: 13 }}>Docs</a>
@@ -37,7 +38,6 @@ export default function Landing() {
         </div>
       </nav>
 
-      {/* hero */}
       <section style={{ maxWidth: 1200, margin: "0 auto", padding: "80px 32px 40px", textAlign: "center" }}>
         <div style={{
           display: "inline-flex", alignItems: "center", gap: 8,
@@ -55,7 +55,7 @@ export default function Landing() {
           </span>
         </h1>
         <p style={{ fontSize: 18, color: "var(--text-2)", maxWidth: 720, margin: "0 auto 36px", lineHeight: 1.6 }}>
-          Ring is live on 7 chains. Users still can&apos;t move between them inside the Ring UI. Plug in Across, and one Swap card serves every chain, every asset, every user.
+          Ring is live and earning fees on 4 chains. Users still can&apos;t move between them inside the Ring UI. Plug in Across, and one Swap card serves every chain, every asset, every user.
         </p>
         <div style={{ display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap" }}>
           <Link href="/swap" className="btn-primary" style={{ fontSize: 15, padding: "14px 28px" }}>
@@ -65,7 +65,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* stat strip */}
       <section style={{ maxWidth: 1200, margin: "40px auto 0", padding: "0 32px" }}>
         <div style={{
           display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 1,
@@ -79,42 +78,28 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* THE OPPORTUNITY */}
       <section id="deal" style={{ maxWidth: 1200, margin: "0 auto", padding: "80px 32px" }}>
         <SectionLabel>What Ring unlocks</SectionLabel>
         <h2 style={{ fontSize: 38, fontWeight: 700, letterSpacing: "-1px", marginBottom: 12 }}>
           One Swap card. Every chain. New revenue.
         </h2>
         <p style={{ fontSize: 16, color: "var(--text-2)", maxWidth: 680, marginBottom: 40 }}>
-          Drop the Across Swap API into the existing Swap card. No UX redesign, no separate bridge product. Users sell on Ethereum, buy on Hyper, ship on Base, all without leaving Ring.
+          Drop the Across Swap API into the existing Swap card. No UX redesign, no separate bridge product. Users sell on Ethereum, buy on Hyperliquid, ship on BSC, all without leaving Ring.
         </p>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
-          <Pillar
-            num="01"
-            title="Retention"
-            line="Stop losing users at the bridge."
-            body="Today, a user holding USDC on Arbitrum who wants exposure on Hyper has to leave Ring, find a bridge, wait, and rarely comes back. With Across embedded, that flow stays in Ring. Same card, same session, same brand."
-            color="#ff5cb3"
-          />
-          <Pillar
-            num="02"
-            title="Reach"
-            line="Onboard users from any chain, any asset."
-            body="Your Hyper deployment is sitting on top of Hyperliquid demand. Across unlocks native deposits from Ethereum, Arbitrum, Base, Optimism, Unichain straight into Ring on Hyper. The ~40% of users who can't currently transact become addressable overnight."
-            color="#9d5cff"
-          />
-          <Pillar
-            num="03"
-            title="Revenue"
-            line="Monetize every cross-chain swap."
+          <Pillar num="01" title="Retention" line="Stop losing users at the bridge."
+            body="Today, a user holding USDC on Arbitrum who wants exposure on Hyperliquid has to leave Ring, find a bridge, wait, and rarely comes back. With Across embedded, that flow stays in Ring. Same card, same session, same brand."
+            color="#ff5cb3" />
+          <Pillar num="02" title="Reach" line="Onboard users from any chain, any asset."
+            body="Your Hyperliquid deployment is sitting on top of one of the most active ecosystems in crypto. Across unlocks native deposits from Ethereum, Arbitrum, Base, Optimism, Polygon, Unichain straight into Ring on Hyperliquid. The users who currently can't reach Ring become addressable overnight."
+            color="#9d5cff" />
+          <Pillar num="03" title="Revenue" line="Monetize every cross-chain swap."
             body="appFee on the Swap API lets Ring take a configurable cut of every cross-chain trade, on top of standard Ring fees. New revenue line, zero engineering on the take-rate side."
-            color="#6464ff"
-          />
+            color="#6464ff" />
         </div>
       </section>
 
-      {/* DEEPER USE CASE */}
       <section style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px 80px" }}>
         <div style={{
           background: "linear-gradient(135deg, rgba(109,245,178,0.06) 0%, rgba(79,79,247,0.06) 100%)",
@@ -135,44 +120,86 @@ export default function Landing() {
             <h3 style={{ fontSize: 28, fontWeight: 700, letterSpacing: "-0.5px", marginBottom: 12 }}>
               Cross-chain deposits into Ring pools.
             </h3>
-            <p style={{ color: "var(--text-2)", fontSize: 15, lineHeight: 1.65, marginBottom: 16 }}>
-              Across destination actions let a user on any chain deposit straight into a Ring pool in one transaction. Sell ETH on Mainnet, LP into a Hyper pool. No manual bridge, no second approval, no idle capital.
-            </p>
-            <p style={{ color: "var(--text-3)", fontSize: 13, lineHeight: 1.5 }}>
-              Same primitive that powers Moonwell, Lido EarnETH, Nest, and ICHI vault flows we&apos;ve shipped with other partners.
+            <p style={{ color: "var(--text-2)", fontSize: 15, lineHeight: 1.65 }}>
+              Across destination actions let a user on any chain deposit straight into a Ring pool in one transaction. Sell ETH on Mainnet, LP into a Hyperliquid pool. No manual bridge, no second approval, no idle capital.
             </p>
           </div>
           <div style={{ background: "var(--bg-card)", borderRadius: "var(--radius)", padding: 24, border: "1px solid var(--border)" }}>
             <FlowStep label="Step 1" body="User holds USDC on Arbitrum." />
             <FlowConnector />
-            <FlowStep label="Step 2" body="Selects 'Add liquidity' on Ring Hyper pool." />
+            <FlowStep label="Step 2" body="Selects 'Add liquidity' on a Ring Hyperliquid pool." />
             <FlowConnector />
             <FlowStep label="Step 3" body="Across routes, fills, and deposits LP atomically." accent />
             <FlowConnector />
-            <FlowStep label="Result" body="LP position live on Hyper. One signature." success />
+            <FlowStep label="Result" body="LP position live on Hyperliquid. One signature." success />
           </div>
         </div>
       </section>
 
-      {/* WHY ACROSS */}
-      <section style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px 80px" }}>
+      <section style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px 64px" }}>
         <SectionLabel>Why Across</SectionLabel>
         <h2 style={{ fontSize: 38, fontWeight: 700, letterSpacing: "-1px", marginBottom: 32 }}>
           The infrastructure under the cross-chain layer.
         </h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
-          <Feature title="Speed" body="Sub-2 second median fill time across all routes." />
-          <Feature title="Cost" body="Lowest fees in the category, verifiable on-chain." />
-          <Feature title="Decentralization" body="40+ competing independent relayers. Funds escrowed in audited contracts, settled via UMA optimistic oracle. No single point of failure." />
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
+          <Feature title="Speed" body="Sub-2 second median fill time across all routes. Fastest in the category." />
+          <Feature title="Cost" body="Lowest fees in the category, verifiable on-chain. Users keep more of their swap." />
+          <Feature title="Decentralization" body="40+ independent relayers compete to fill. Funds escrowed in audited contracts, settled via UMA optimistic oracle. No single point of failure." />
           <Feature title="SLAs" body="Volume commitments, dedicated relayers, integrator-grade support and uptime guarantees for partners shipping in production." />
-          <Feature title="Marketing" body="Co-marketing on launch, X amplification, joint blog content, ecosystem placement across the Across partner network." />
-          <Feature title="Coverage" body="Ethereum, Arbitrum, Base, Optimism, Polygon, Unichain, Linea, Blast, Mode, Lens, World, ZkSync, Ink, Soneium, Hyper, Plasma." />
-          <Feature title="Battle-tested" body="$35B+ bridged. Largest intent-based bridge by sustained volume since 2022." />
-          <Feature title="Appfee" body="Configurable take-rate on every swap. Goes straight to a Ring-controlled address." />
+          <Feature title="Marketing" body="Co-launch announcements, X amplification, joint blog content, ecosystem placement across the Across partner network." />
+          <Feature title="appFee" body="Configurable take-rate on every swap, paid out to a Ring-controlled address. New revenue stream with zero engineering on the take side." />
         </div>
       </section>
 
-      {/* PARTNERS */}
+      <section style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px 80px" }}>
+        <SectionLabel>Coverage</SectionLabel>
+        <h2 style={{ fontSize: 30, fontWeight: 700, letterSpacing: "-0.5px", marginBottom: 8 }}>
+          Live on every chain Ring touches. Plus many more.
+        </h2>
+        <p style={{ fontSize: 15, color: "var(--text-2)", marginBottom: 28, maxWidth: 680 }}>
+          Across natively supports every chain where Ring earns fees today. Adding the Swap API immediately unlocks every other chain where Ring users hold capital.
+        </p>
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
+          gap: 10,
+        }}>
+          {COVERAGE_CHAINS.map((c) => (
+            <div key={c.name} style={{
+              background: c.onRing ? "rgba(109,245,178,0.06)" : "var(--bg-card)",
+              border: `1px solid ${c.onRing ? "rgba(109,245,178,0.28)" : "var(--border)"}`,
+              borderRadius: "var(--radius)",
+              padding: "14px 16px",
+              display: "flex", alignItems: "center", gap: 10,
+              position: "relative",
+            }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={c.logo} alt={c.name} width={22} height={22} style={{ borderRadius: "50%", flexShrink: 0 }} />
+              <span style={{ fontWeight: 600, fontSize: 13, color: "var(--text)" }}>{c.name}</span>
+              {c.onRing && (
+                <span style={{
+                  position: "absolute", top: 6, right: 6,
+                  fontSize: 8, fontWeight: 700, letterSpacing: "0.4px",
+                  color: "var(--across-green)",
+                  background: "rgba(109,245,178,0.12)",
+                  padding: "2px 5px", borderRadius: 4,
+                }}>RING</span>
+              )}
+            </div>
+          ))}
+          <div style={{
+            background: "transparent",
+            border: "1px dashed var(--border)",
+            borderRadius: "var(--radius)",
+            padding: "14px 16px",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            color: "var(--text-3)", fontWeight: 500, fontSize: 13,
+          }}>
+            and more
+          </div>
+        </div>
+      </section>
+
       <section style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px 80px" }}>
         <SectionLabel>Trusted by</SectionLabel>
         <h2 style={{ fontSize: 28, fontWeight: 700, letterSpacing: "-0.5px", marginBottom: 24 }}>
@@ -196,14 +223,16 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* CREDENTIALS */}
       <section style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px 60px" }}>
         <SectionLabel>Ready to integrate</SectionLabel>
         <h2 style={{ fontSize: 32, fontWeight: 700, letterSpacing: "-0.5px", marginBottom: 8 }}>
           Ring&apos;s production credentials.
         </h2>
-        <p style={{ fontSize: 15, color: "var(--text-2)", marginBottom: 24, maxWidth: 640 }}>
-          Pre-provisioned by the Across team for Ring Protocol. Use these in any environment, from local builds to production deployments. Volume attributes back to Ring automatically.
+        <p style={{ fontSize: 15, color: "var(--text-2)", marginBottom: 24, maxWidth: 680, lineHeight: 1.6 }}>
+          Pre-provisioned by the Across team for Ring Protocol. Use these in any environment, from local builds to production deployments. Volume attributes back to Ring automatically.{" "}
+          <a href="https://docs.across.to/" target="_blank" rel="noreferrer" style={{ color: "var(--across-green)", textDecoration: "underline" }}>
+            Read the integration docs →
+          </a>
         </p>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           <CredCard
@@ -219,7 +248,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* CTA */}
       <section style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px 100px" }}>
         <div style={{
           background: "linear-gradient(135deg, #1a1a26 0%, #15151b 100%)",
@@ -239,8 +267,8 @@ export default function Landing() {
             <h2 style={{ fontSize: 36, fontWeight: 700, letterSpacing: "-1px", marginBottom: 14 }}>
               The PoC is already running.
             </h2>
-            <p style={{ fontSize: 16, color: "var(--text-2)", maxWidth: 540, margin: "0 auto 28px" }}>
-              The cross-chain tab below is the Ring UI with the Across Swap API wired in. Live quotes, live execution, on-chain settlement.
+            <p style={{ fontSize: 16, color: "var(--text-2)", maxWidth: 560, margin: "0 auto 28px" }}>
+              The Cross-chain tab is the Ring UI with the Across Swap API wired in. Live quotes, live execution, on-chain settlement.
             </p>
             <Link href="/swap" className="btn-primary" style={{ fontSize: 15, padding: "14px 30px" }}>
               Open the live PoC →
@@ -249,20 +277,20 @@ export default function Landing() {
         </div>
       </section>
 
-      <footer style={{ padding: "24px 32px", borderTop: "1px solid var(--border-soft)", color: "var(--text-3)", fontSize: 12, display: "flex", justifyContent: "space-between" }}>
+      <footer style={{
+        padding: "24px 32px", borderTop: "1px solid var(--border-soft)",
+        color: "var(--text-3)", fontSize: 12,
+        display: "flex", justifyContent: "space-between", alignItems: "center",
+        flexWrap: "wrap", gap: 8,
+      }}>
         <span>Built for Ring Protocol by Across. Risk Labs, 2026.</span>
-        <a href="https://across.to" target="_blank" rel="noreferrer">across.to</a>
+        <div style={{ display: "flex", gap: 18 }}>
+          <a href="https://across.to" target="_blank" rel="noreferrer">across.to</a>
+          <a href="https://docs.across.to" target="_blank" rel="noreferrer">docs.across.to</a>
+          <a href="https://x.com/AcrossProtocol" target="_blank" rel="noreferrer">@AcrossProtocol</a>
+        </div>
       </footer>
     </main>
-  );
-}
-
-function AcrossLogo() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="12" cy="12" r="11" fill="#6df5b2" />
-      <path d="M7.5 16L12 7L16.5 16M9 13.5H15" stroke="#0d2b1d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
   );
 }
 
@@ -312,10 +340,10 @@ function Feature({ title, body }: { title: string; body: string }) {
       background: "var(--bg-card)",
       border: "1px solid var(--border)",
       borderRadius: "var(--radius)",
-      padding: 20,
+      padding: 22,
     }}>
-      <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 8, color: "var(--text)" }}>{title}</div>
-      <div style={{ fontSize: 13, color: "var(--text-2)", lineHeight: 1.55 }}>{body}</div>
+      <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 8, color: "var(--text)" }}>{title}</div>
+      <div style={{ fontSize: 13, color: "var(--text-2)", lineHeight: 1.6 }}>{body}</div>
     </div>
   );
 }

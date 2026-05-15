@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect, useRef } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useAccount, useChainId, useSwitchChain, useWalletClient, usePublicClient } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
@@ -20,11 +21,10 @@ export default function SwapPage() {
 
   return (
     <main style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)" }}>
-      {/* TOP NAV (mirrors Ring) */}
       <nav style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 32px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
           <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div className="ring-logo" />
+            <Image src="/ring-logo.png" alt="Ring" width={28} height={28} style={{ borderRadius: 6 }} />
             <span className="ring-text" style={{ fontSize: 17 }}>Ring Swap</span>
             <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 4l3 3 3-3" stroke="#999" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </Link>
@@ -44,19 +44,13 @@ export default function SwapPage() {
         </div>
       </nav>
 
-      {/* SWAP CARD */}
       <div style={{ display: "flex", justifyContent: "center", padding: "32px 16px 80px" }}>
         <div style={{ width: "100%", maxWidth: 480 }}>
-          {/* tabs */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
             <div style={{ display: "flex", gap: 4, background: "var(--bg-card)", padding: 4, borderRadius: 999 }}>
               <TabPill active={tab === "swap"} onClick={() => setTab("swap")}>Swap</TabPill>
               <TabPill active={tab === "stock"} onClick={() => setTab("stock")}>Stock</TabPill>
-              <TabPill
-                active={tab === "crosschain"}
-                onClick={() => setTab("crosschain")}
-                accent
-              >Cross-chain</TabPill>
+              <TabPill active={tab === "crosschain"} onClick={() => setTab("crosschain")} accent>Cross-chain</TabPill>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <button style={{ width: 32, height: 32, borderRadius: 8, background: "var(--bg-card)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-2)" }}>
@@ -78,7 +72,6 @@ export default function SwapPage() {
             </div>
           </div>
 
-          {/* card content */}
           {tab === "swap" && <SameChainCard label="Same-chain swap (Ring native)" />}
           {tab === "stock" && <SameChainCard label="Stock swap" />}
           {tab === "crosschain" && <CrossChainCard />}
@@ -87,8 +80,6 @@ export default function SwapPage() {
     </main>
   );
 }
-
-/* ------------------------- NAV / UI ------------------------- */
 
 function NavLink({ children, active }: { children: React.ReactNode; active?: boolean }) {
   return (
@@ -130,8 +121,6 @@ function Dot({ color, offset = 0 }: { color: string; offset?: number }) {
   return <span style={{ width: 14, height: 14, borderRadius: "50%", background: color, marginLeft: offset, border: "1.5px solid var(--bg-card)" }} />;
 }
 
-/* ------------------- SAME CHAIN (visual only) ------------------- */
-
 function SameChainCard({ label }: { label: string }) {
   return (
     <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: 12 }}>
@@ -158,7 +147,8 @@ function SimpleTokenBox({ label, symbol, placeholder }: { label: string; symbol:
         <div style={{ fontSize: 40, color: "var(--text-3)", fontWeight: 400 }}>0</div>
         {symbol ? (
           <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 10px 6px 6px", background: "var(--bg-card)", borderRadius: 999 }}>
-            <div style={{ width: 24, height: 24, borderRadius: "50%", background: "#627eea", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: "#fff" }}>E</div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={TOKENS[symbol]?.logo} alt={symbol} width={24} height={24} style={{ borderRadius: "50%" }} />
             <span style={{ fontWeight: 700 }}>{symbol}</span>
             <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 4l3 3 3-3" stroke="#999" strokeWidth="1.4"/></svg>
           </div>
@@ -184,7 +174,7 @@ function CrossChainCard() {
   const publicClient = usePublicClient();
 
   const [sellChain, setSellChain] = useState(42161);
-  const [buyChain, setBuyChain] = useState(8453);
+  const [buyChain, setBuyChain] = useState(999);
   const [sellSymbol, setSellSymbol] = useState("USDC");
   const [buySymbol, setBuySymbol] = useState("USDC");
   const [amount, setAmount] = useState("");
@@ -202,7 +192,6 @@ function CrossChainCard() {
   const sellToken = TOKENS[sellSymbol];
   const buyToken = TOKENS[buySymbol];
 
-  // Auto-quote on amount change (debounced)
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
   useEffect(() => {
     setQuote(null);
@@ -242,14 +231,12 @@ function CrossChainCard() {
     }, 350);
 
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
-  }, [amount, address, isConnected, sellTokenAddr, buyTokenAddr, sellChain, buyChain, sellSymbol, buySymbol, sellToken.decimals]);
+  }, [amount, address, isConnected, sellTokenAddr, buyTokenAddr, sellChain, buyChain, sellSymbol, buySymbol, sellToken?.decimals]);
 
-  // Sync wallet chain before tx
   async function ensureChain(targetId: number): Promise<boolean> {
     if (walletChainId === targetId) return true;
     try {
       await switchChain({ chainId: targetId });
-      // give wallet a moment
       await new Promise((r) => setTimeout(r, 800));
       return true;
     } catch {
@@ -292,7 +279,6 @@ function CrossChainCard() {
         return;
       }
 
-      // approvals (from checks.allowance, not approvalTxns)
       if (needsApproval(quote)) {
         setPhase("approving");
         setTxMessage("Approving token spend...");
@@ -308,7 +294,6 @@ function CrossChainCard() {
         await publicClient.waitForTransactionReceipt({ hash });
       }
 
-      // deposit
       if (!quote.swapTx) throw new Error("No swap tx in quote");
       setPhase("depositing");
       setTxMessage("Confirm in wallet...");
@@ -319,7 +304,7 @@ function CrossChainCard() {
         chainId: sellChain,
       });
       setOriginTx(txHash);
-      setTxMessage("Submitted. Waiting for confirmation on " + CHAINS[sellChain].name + "...");
+      setTxMessage(`Submitted. Waiting for confirmation on ${CHAINS[sellChain].name}...`);
       await publicClient.waitForTransactionReceipt({ hash: txHash });
 
       setPhase("filling");
@@ -332,6 +317,7 @@ function CrossChainCard() {
   }
 
   function flip() {
+    if (!SOURCE_CHAINS.includes(buyChain) || !DEST_CHAINS.includes(sellChain)) return;
     setSellChain(buyChain);
     setBuyChain(sellChain);
     setSellSymbol(buySymbol);
@@ -358,20 +344,18 @@ function CrossChainCard() {
 
   return (
     <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: 12, position: "relative" }}>
-      {/* powered-by ribbon */}
       <div style={{
         position: "absolute", top: -10, right: 16,
-        background: "var(--bg)", padding: "2px 10px",
+        background: "var(--bg)", padding: "3px 10px",
         fontSize: 10, color: "var(--across-green)",
         border: "1px solid rgba(109,245,178,0.25)", borderRadius: 999,
         fontWeight: 600, letterSpacing: "0.5px",
         display: "flex", alignItems: "center", gap: 6,
       }}>
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="#6df5b2"/><path d="M7.5 16L12 7L16.5 16M9 13.5H15" stroke="#0d2b1d" strokeWidth="3" strokeLinecap="round"/></svg>
+        <Image src="/across-logo.png" alt="Across" width={12} height={12} style={{ borderRadius: "50%" }} />
         POWERED BY ACROSS
       </div>
 
-      {/* sell box */}
       <TokenBox
         label="Sell"
         chainId={sellChain}
@@ -395,7 +379,6 @@ function CrossChainCard() {
         </button>
       </div>
 
-      {/* buy box */}
       <TokenBox
         label="Buy"
         chainId={buyChain}
@@ -408,7 +391,6 @@ function CrossChainCard() {
         muted={!quote}
       />
 
-      {/* QUOTE DETAILS */}
       {(quoting || quote || quoteError) && (
         <div className="fade-in" style={{
           marginTop: 10, padding: 14,
@@ -435,7 +417,6 @@ function CrossChainCard() {
         </div>
       )}
 
-      {/* EXECUTE BUTTON */}
       <button
         onClick={buttonState.action}
         disabled={buttonState.disabled}
@@ -452,7 +433,6 @@ function CrossChainCard() {
         {buttonState.label}
       </button>
 
-      {/* TX STATUS */}
       {phase !== "idle" && (
         <div className="fade-in" style={{
           marginTop: 10, padding: 12,
@@ -489,8 +469,6 @@ function CrossChainCard() {
   );
 }
 
-/* ----------- Cross-chain sub-components ----------- */
-
 function TokenBox({
   label, chainId, symbol, amount, onAmountChange, onChainChange, onSymbolChange, chainOptions, editable, readonly, muted,
 }: {
@@ -511,7 +489,6 @@ function TokenBox({
   const chain = CHAINS[chainId];
   const availableTokens = tokensOnChain(chainId);
 
-  // If symbol not on chain, default to first available
   useEffect(() => {
     if (!availableTokens.includes(symbol) && availableTokens.length > 0) {
       onSymbolChange(availableTokens[0]);
@@ -522,13 +499,7 @@ function TokenBox({
     <div style={{ background: "var(--bg-elev)", borderRadius: "var(--radius)", padding: 16, position: "relative" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
         <span style={{ fontSize: 12, color: "var(--text-3)" }}>{label}</span>
-        <ChainPicker
-          chain={chain}
-          open={chainOpen}
-          setOpen={setChainOpen}
-          options={chainOptions}
-          onSelect={onChainChange}
-        />
+        <ChainPicker chain={chain} open={chainOpen} setOpen={setChainOpen} options={chainOptions} onSelect={onChainChange} />
       </div>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
         {editable ? (
@@ -553,13 +524,7 @@ function TokenBox({
             {amount || "0"}
           </div>
         )}
-        <TokenPicker
-          symbol={symbol}
-          open={tokenOpen}
-          setOpen={setTokenOpen}
-          options={availableTokens}
-          onSelect={onSymbolChange}
-        />
+        <TokenPicker symbol={symbol} open={tokenOpen} setOpen={setTokenOpen} options={availableTokens} onSelect={onSymbolChange} />
       </div>
     </div>
   );
@@ -568,40 +533,48 @@ function TokenBox({
 function ChainPicker({ chain, open, setOpen, options, onSelect }: {
   chain: any; open: boolean; setOpen: (b: boolean) => void; options: number[]; onSelect: (id: number) => void;
 }) {
+  if (!chain) return null;
   return (
     <div style={{ position: "relative" }}>
       <button onClick={() => setOpen(!open)} style={{
         display: "flex", alignItems: "center", gap: 6,
-        padding: "5px 10px 5px 8px", background: "var(--bg-card)",
+        padding: "4px 10px 4px 4px", background: "var(--bg-card)",
         borderRadius: 999, fontSize: 12, color: "var(--text-2)",
       }}>
-        <span style={{ width: 6, height: 6, borderRadius: "50%", background: chain.color }} />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={chain.logo} alt={chain.name} width={18} height={18} style={{ borderRadius: "50%" }} />
         {chain.name}
-        <svg width="8" height="8" viewBox="0 0 10 10" fill="none"><path d="M2 4l3 3 3-3" stroke="currentColor" strokeWidth="1.4"/></svg>
+        <svg width="8" height="8" viewBox="0 0 10 10" fill="none" style={{ marginRight: 4 }}><path d="M2 4l3 3 3-3" stroke="currentColor" strokeWidth="1.4"/></svg>
       </button>
       {open && (
-        <div style={{
-          position: "absolute", top: "calc(100% + 6px)", right: 0,
-          background: "var(--bg-card)", border: "1px solid var(--border)",
-          borderRadius: "var(--radius)", padding: 6,
-          minWidth: 160, zIndex: 30, boxShadow: "0 12px 36px rgba(0,0,0,0.5)",
-        }}>
-          {options.map((id) => {
-            const c = CHAINS[id];
-            return (
-              <button key={id} onClick={() => { onSelect(id); setOpen(false); }} style={{
-                width: "100%", padding: "8px 10px", borderRadius: 8,
-                display: "flex", alignItems: "center", gap: 8,
-                fontSize: 13, color: "var(--text)",
-                background: id === chain.id ? "var(--bg-elev)" : "transparent",
-                textAlign: "left",
-              }}>
-                <span style={{ width: 8, height: 8, borderRadius: "50%", background: c.color }} />
-                {c.name}
-              </button>
-            );
-          })}
-        </div>
+        <>
+          <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 20 }} />
+          <div style={{
+            position: "absolute", top: "calc(100% + 6px)", right: 0,
+            background: "var(--bg-card)", border: "1px solid var(--border)",
+            borderRadius: "var(--radius)", padding: 6,
+            minWidth: 180, zIndex: 30, boxShadow: "0 12px 36px rgba(0,0,0,0.5)",
+            maxHeight: 320, overflowY: "auto",
+          }}>
+            {options.map((id) => {
+              const c = CHAINS[id];
+              if (!c) return null;
+              return (
+                <button key={id} onClick={() => { onSelect(id); setOpen(false); }} style={{
+                  width: "100%", padding: "8px 10px", borderRadius: 8,
+                  display: "flex", alignItems: "center", gap: 8,
+                  fontSize: 13, color: "var(--text)",
+                  background: id === chain.id ? "var(--bg-elev)" : "transparent",
+                  textAlign: "left",
+                }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={c.logo} alt={c.name} width={20} height={20} style={{ borderRadius: "50%" }} />
+                  {c.name}
+                </button>
+              );
+            })}
+          </div>
+        </>
       )}
     </div>
   );
@@ -610,6 +583,7 @@ function ChainPicker({ chain, open, setOpen, options, onSelect }: {
 function TokenPicker({ symbol, open, setOpen, options, onSelect }: {
   symbol: string; open: boolean; setOpen: (b: boolean) => void; options: string[]; onSelect: (s: string) => void;
 }) {
+  const token = TOKENS[symbol];
   return (
     <div style={{ position: "relative", flexShrink: 0 }}>
       <button onClick={() => setOpen(!open)} style={{
@@ -617,48 +591,42 @@ function TokenPicker({ symbol, open, setOpen, options, onSelect }: {
         padding: "6px 10px 6px 6px", background: "var(--bg-card)",
         borderRadius: 999, fontSize: 14, fontWeight: 700,
       }}>
-        <TokenAvatar symbol={symbol} />
+        {token && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={token.logo} alt={symbol} width={22} height={22} style={{ borderRadius: "50%" }} />
+        )}
         {symbol}
         <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 4l3 3 3-3" stroke="#999" strokeWidth="1.4"/></svg>
       </button>
       {open && (
-        <div style={{
-          position: "absolute", top: "calc(100% + 6px)", right: 0,
-          background: "var(--bg-card)", border: "1px solid var(--border)",
-          borderRadius: "var(--radius)", padding: 6,
-          minWidth: 140, zIndex: 30, boxShadow: "0 12px 36px rgba(0,0,0,0.5)",
-        }}>
-          {options.map((s) => (
-            <button key={s} onClick={() => { onSelect(s); setOpen(false); }} style={{
-              width: "100%", padding: "8px 10px", borderRadius: 8,
-              display: "flex", alignItems: "center", gap: 8,
-              fontSize: 14, fontWeight: 600, color: "var(--text)",
-              background: s === symbol ? "var(--bg-elev)" : "transparent",
-              textAlign: "left",
-            }}>
-              <TokenAvatar symbol={s} />
-              {s}
-            </button>
-          ))}
-        </div>
+        <>
+          <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 20 }} />
+          <div style={{
+            position: "absolute", top: "calc(100% + 6px)", right: 0,
+            background: "var(--bg-card)", border: "1px solid var(--border)",
+            borderRadius: "var(--radius)", padding: 6,
+            minWidth: 150, zIndex: 30, boxShadow: "0 12px 36px rgba(0,0,0,0.5)",
+          }}>
+            {options.map((s) => {
+              const t = TOKENS[s];
+              return (
+                <button key={s} onClick={() => { onSelect(s); setOpen(false); }} style={{
+                  width: "100%", padding: "8px 10px", borderRadius: 8,
+                  display: "flex", alignItems: "center", gap: 8,
+                  fontSize: 14, fontWeight: 600, color: "var(--text)",
+                  background: s === symbol ? "var(--bg-elev)" : "transparent",
+                  textAlign: "left",
+                }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={t.logo} alt={s} width={22} height={22} style={{ borderRadius: "50%" }} />
+                  {s}
+                </button>
+              );
+            })}
+          </div>
+        </>
       )}
     </div>
-  );
-}
-
-function TokenAvatar({ symbol }: { symbol: string }) {
-  const colors: Record<string, string> = {
-    ETH: "#627eea", WETH: "#627eea",
-    USDC: "#2775ca", USDT: "#26a17b",
-    WBTC: "#f7931a", DAI: "#f5ac37",
-  };
-  return (
-    <div style={{
-      width: 22, height: 22, borderRadius: "50%",
-      background: colors[symbol] || "#666",
-      display: "flex", alignItems: "center", justifyContent: "center",
-      fontSize: 10, fontWeight: 700, color: "#fff",
-    }}>{symbol[0]}</div>
   );
 }
 
