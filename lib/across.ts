@@ -19,12 +19,14 @@ export const CHAINS: Record<number, AcrossChain> = {
   8453:  { id: 8453,  name: "Base",        shortName: "BASE",  color: "#0052ff", explorer: "https://basescan.org",            logo: `${LOGO_BASE}/base.svg` },
   81457: { id: 81457, name: "Blast",       shortName: "BLAST", color: "#fcfc03", explorer: "https://blastscan.io",            logo: `${LOGO_BASE}/blast.svg` },
   999:   { id: 999,   name: "HyperEVM",    shortName: "HYPE",  color: "#97fce4", explorer: "https://hyperevmscan.io",         logo: `${LOGO_BASE}/hyperevm.svg` },
+  1337:  { id: 1337,  name: "HyperCore",   shortName: "CORE",  color: "#97fce4", explorer: "https://app.hyperliquid.xyz/explorer", logo: `${LOGO_BASE}/hypercore.svg` },
 };
 
 export type AcrossToken = {
   symbol: string;
   name: string;
   decimals: number;
+  decimalsByChain?: Partial<Record<number, number>>;
   addresses: Partial<Record<number, string>>;
   logo: string;
 };
@@ -59,6 +61,7 @@ export const TOKENS: Record<string, AcrossToken> = {
     symbol: "USDC",
     name: "USD Coin",
     decimals: 6,
+    decimalsByChain: { 1337: 8 },
     addresses: {
       1: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
       10: "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
@@ -68,6 +71,7 @@ export const TOKENS: Record<string, AcrossToken> = {
       130: "0x078D782b760474a361dDA0AF3839290b0EF57AD6",
       137: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
       999: "0xb88339CB7199b77E23DB6E890353E22632Ba630f",
+      1337: "0x2000000000000000000000000000000000000000",
     },
     logo: TW("0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"),
   },
@@ -75,12 +79,14 @@ export const TOKENS: Record<string, AcrossToken> = {
     symbol: "USDT",
     name: "Tether",
     decimals: 6,
+    decimalsByChain: { 1337: 8 },
     addresses: {
       1: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
       10: "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58",
       56: "0x55d398326f99059fF775485246999027B3197955",
       42161: "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
       137: "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
+      1337: "0x200000000000000000000000000000000000010C",
     },
     logo: TW("0xdAC17F958D2ee523a2206206994597C13D831ec7"),
   },
@@ -109,12 +115,18 @@ export const TOKENS: Record<string, AcrossToken> = {
   },
 };
 
-// Source = where users hold assets. Destination = Ring's 4 active chains plus extras for flex.
+// Source = where users hold assets. Destination = Ring's 4 active chains plus Hyperliquid stack.
 export const SOURCE_CHAINS = [1, 10, 56, 137, 42161, 8453, 130, 81457];
-export const DEST_CHAINS = [1, 56, 42161, 8453, 130, 81457, 999];
+export const DEST_CHAINS = [1, 56, 42161, 8453, 130, 81457, 999, 1337];
 
 export function tokenForChain(symbol: string, chainId: number): string | undefined {
   return TOKENS[symbol]?.addresses[chainId];
+}
+
+export function tokenDecimals(symbol: string, chainId: number): number {
+  const t = TOKENS[symbol];
+  if (!t) return 18;
+  return t.decimalsByChain?.[chainId] ?? t.decimals;
 }
 
 export function tokensOnChain(chainId: number): string[] {
@@ -185,7 +197,7 @@ export async function fetchSwapQuote(params: {
   url.searchParams.set("amount", params.amount);
   url.searchParams.set("depositor", params.depositor);
   if (params.recipient) url.searchParams.set("recipient", params.recipient);
-  url.searchParams.set("tradeType", params.tradeType || "minOutput");
+  url.searchParams.set("tradeType", params.tradeType || "exactInput");
 
   const res = await fetch(url.toString());
   if (!res.ok) {

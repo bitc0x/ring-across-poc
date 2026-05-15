@@ -7,7 +7,7 @@ import { useAccount, useChainId, useSwitchChain, useWalletClient, usePublicClien
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import {
   CHAINS, TOKENS, SOURCE_CHAINS, DEST_CHAINS,
-  tokenForChain, tokensOnChain, fetchSwapQuote,
+  tokenForChain, tokenDecimals, tokensOnChain, fetchSwapQuote,
   formatTokenAmount, formatFillTime,
   bridgeFeePct, needsApproval, buildApprovalCalldata,
   type SwapQuote,
@@ -206,7 +206,7 @@ function CrossChainCard() {
     debounceRef.current = setTimeout(async () => {
       setQuoting(true);
       try {
-        const wei = parseUnits(amount, sellToken.decimals).toString();
+        const wei = parseUnits(amount, tokenDecimals(sellSymbol, sellChain)).toString();
         const q = await fetchSwapQuote({
           inputToken: sellTokenAddr,
           outputToken: buyTokenAddr,
@@ -231,7 +231,7 @@ function CrossChainCard() {
     }, 350);
 
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
-  }, [amount, address, isConnected, sellTokenAddr, buyTokenAddr, sellChain, buyChain, sellSymbol, buySymbol, sellToken?.decimals]);
+  }, [amount, address, isConnected, sellTokenAddr, buyTokenAddr, sellChain, buyChain, sellSymbol, buySymbol]);
 
   async function ensureChain(targetId: number): Promise<boolean> {
     if (walletChainId === targetId) return true;
@@ -325,7 +325,7 @@ function CrossChainCard() {
   }
 
   const outputAmount = quote && buyToken
-    ? formatTokenAmount(quote.expectedOutputAmount, buyToken.decimals, 4)
+    ? formatTokenAmount(quote.expectedOutputAmount, tokenDecimals(buySymbol, buyChain), 4)
     : "0";
 
   const buttonState = (() => {
@@ -398,7 +398,7 @@ function CrossChainCard() {
           {quote && !quoting && (
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 16px" }}>
               <DetailRow label="Fill time" value={formatFillTime(quote.expectedFillTime)} highlight />
-              <DetailRow label="Min received" value={`${formatTokenAmount(quote.minOutputAmount, buyToken.decimals, 4)} ${buySymbol}`} />
+              <DetailRow label="Min received" value={`${formatTokenAmount(quote.minOutputAmount, tokenDecimals(buySymbol, buyChain), 4)} ${buySymbol}`} />
               <DetailRow label="Bridge fee" value={`${bridgeFeePct(quote).toFixed(4)}%`} />
               <DetailRow label="Route" value={`${CHAINS[sellChain].shortName} → ${CHAINS[buyChain].shortName}`} />
             </div>

@@ -188,6 +188,71 @@ export default function Landing() {
       </section>
 
       <section style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px 80px" }}>
+        <SectionLabel>Cost vs alternatives</SectionLabel>
+        <h2 style={{ fontSize: 38, fontWeight: 700, letterSpacing: "-1px", marginBottom: 12 }}>
+          Cheapest on every route. Often free.
+        </h2>
+        <p style={{ fontSize: 16, color: "var(--text-2)", marginBottom: 28, maxWidth: 760, lineHeight: 1.6 }}>
+          Live benchmark on the routes that matter most to Ring: Ethereum into Hyperliquid, in both stablecoins and stablecoin-to-stablecoin. Across is the lowest cost on every one, and sponsored (free) on USDT to USDC into HyperCore.
+        </p>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 16 }}>
+          <CostCard
+            route="USDC · $100"
+            from="Ethereum"
+            to="HyperEVM"
+            rows={[
+              { name: "Across",   tag: "LOWEST",  cost: "$0.017", bps: "1.7 bps", time: "~4s",       vs: "1.0×",   color: "var(--across-green)" },
+              { name: "Relay",    tag: "",        cost: "$0.051", bps: "5.1 bps", time: "~3s",       vs: "2.94×",  color: "#f0b429" },
+              { name: "Li.Fi",    tag: "AGG",     cost: "$0.265", bps: "26.5 bps",time: "~4s",       vs: "15.3×",  color: "#ef4444", sub: "routed via AcrossV4" },
+              { name: "deBridge", tag: "",        cost: "$3.04",  bps: "303.6 bps",time:"30-90s",    vs: "175×",   color: "#ef4444" },
+            ]}
+          />
+
+          <CostCard
+            route="USDC · $100"
+            from="Ethereum"
+            to="HyperCore"
+            rows={[
+              { name: "Across",   tag: "LOWEST",  cost: "$0.019", bps: "1.9 bps", time: "~4s",       vs: "1.0×",     color: "var(--across-green)" },
+              { name: "Relay",    tag: "",        cost: "$0.028", bps: "2.8 bps", time: "~2s",       vs: "1.48×",    color: "#f0b429" },
+              { name: "Li.Fi",    tag: "AGG",     cost: "$0.278", bps: "27.8 bps",time: "~2s",       vs: "14.7×",    color: "#ef4444", sub: "routed via Relay" },
+              { name: "deBridge", tag: "",        cost: "Unsupported", bps: "", time: "·",           vs: "·",        color: "var(--text-3)", muted: true },
+            ]}
+          />
+
+          <CostCard
+            route="USDT to USDC · $100"
+            from="Ethereum"
+            to="HyperCore"
+            highlight
+            rows={[
+              { name: "Across",   tag: "SPONSORED", cost: "$0.00 (FREE)", bps: "0 bps · sponsored", time: "~6s",   vs: "1.0×",    color: "var(--across-green)" },
+              { name: "Relay",    tag: "",          cost: "$0.038",       bps: "3.8 bps",            time: "~2s",   vs: "+$0.038", color: "#f0b429" },
+              { name: "Li.Fi",    tag: "AGG",       cost: "$0.277",       bps: "27.7 bps",           time: "~2s",   vs: "+$0.277", color: "#ef4444", sub: "routed via Relay" },
+              { name: "deBridge", tag: "",          cost: "Unsupported",  bps: "",                   time: "·",     vs: "·",       color: "var(--text-3)", muted: true },
+            ]}
+          />
+
+          <CostCard
+            route="USDT to USDC · $100"
+            from="Ethereum"
+            to="HyperEVM"
+            rows={[
+              { name: "Across",   tag: "LOWEST",  cost: "$0.020", bps: "2.0 bps", time: "~6s",       vs: "1.0×",   color: "var(--across-green)" },
+              { name: "Relay",    tag: "",        cost: "$0.075", bps: "7.5 bps", time: "~3s",       vs: "3.86×",  color: "#f0b429" },
+              { name: "Li.Fi",    tag: "AGG",     cost: "$0.258", bps: "25.8 bps",time: "~6s",       vs: "13.2×",  color: "#ef4444", sub: "routed via AcrossV4" },
+              { name: "deBridge", tag: "",        cost: "$3.16",  bps: "315.6 bps",time:"30-90s",    vs: "162×",   color: "#ef4444" },
+            ]}
+          />
+        </div>
+
+        <div style={{ fontSize: 11, color: "var(--text-3)", marginTop: 18, fontStyle: "italic" }}>
+          Source: Across internal benchmark, May 2026. All-in cost includes bridge fee, protocol fee, and price impact. Live quotes against each protocol&apos;s public API, normalized to $100 input.
+        </div>
+      </section>
+
+      <section style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px 80px" }}>
         <SectionLabel>Coverage</SectionLabel>
         <h2 style={{ fontSize: 30, fontWeight: 700, letterSpacing: "-0.5px", marginBottom: 8 }}>
           Live on every chain Ring touches. Plus many more.
@@ -408,6 +473,103 @@ function FlowStep({ label, body, accent, success }: { label: string; body: strin
 
 function FlowConnector() {
   return <div style={{ marginLeft: 13.5, width: 1, height: 14, background: "var(--border)" }} />;
+}
+
+type CostRow = {
+  name: string;
+  tag: string;
+  cost: string;
+  bps: string;
+  time: string;
+  vs: string;
+  color: string;
+  sub?: string;
+  muted?: boolean;
+};
+
+function CostCard({ route, from, to, rows, highlight }: {
+  route: string; from: string; to: string; rows: CostRow[]; highlight?: boolean;
+}) {
+  return (
+    <div style={{
+      background: "var(--bg-card)",
+      border: `1px solid ${highlight ? "rgba(109,245,178,0.28)" : "var(--border)"}`,
+      borderRadius: "var(--radius-lg)",
+      padding: 20,
+      position: "relative",
+      overflow: "hidden",
+    }}>
+      {highlight && (
+        <div style={{
+          position: "absolute", top: 0, left: 0, right: 0, height: 2,
+          background: "linear-gradient(90deg, var(--across-green), transparent)",
+        }} />
+      )}
+      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 14, gap: 8, flexWrap: "wrap" }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text)" }}>{route}</div>
+        <div style={{
+          fontSize: 11, color: "var(--text-3)", fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
+          letterSpacing: "0.3px",
+        }}>
+          {from} <span style={{ color: "var(--text-3)" }}>→</span> {to}
+        </div>
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+        {rows.map((r, i) => (
+          <div key={r.name} style={{
+            display: "grid",
+            gridTemplateColumns: "1.2fr 1.4fr 0.8fr",
+            gap: 12,
+            alignItems: "center",
+            padding: "12px 0",
+            borderBottom: i < rows.length - 1 ? "1px solid var(--border-soft)" : "none",
+            opacity: r.muted ? 0.55 : 1,
+          }}>
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: r.sub ? 2 : 0 }}>
+                <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{r.name}</span>
+                {r.tag && (
+                  <span style={{
+                    fontSize: 8, fontWeight: 700, letterSpacing: "0.5px",
+                    padding: "2px 5px",
+                    borderRadius: 3,
+                    background: r.tag === "LOWEST" || r.tag === "SPONSORED" ? "rgba(109,245,178,0.12)" :
+                                 r.tag === "AGG" ? "rgba(240,180,41,0.12)" :
+                                 "var(--bg-elev)",
+                    color: r.tag === "LOWEST" || r.tag === "SPONSORED" ? "var(--across-green)" :
+                            r.tag === "AGG" ? "#f0b429" :
+                            "var(--text-3)",
+                    border: `1px solid ${r.tag === "LOWEST" || r.tag === "SPONSORED" ? "rgba(109,245,178,0.3)" :
+                                          r.tag === "AGG" ? "rgba(240,180,41,0.3)" :
+                                          "var(--border)"}`,
+                  }}>{r.tag}</span>
+                )}
+              </div>
+              {r.sub && <div style={{ fontSize: 10, color: "var(--text-3)" }}>{r.sub}</div>}
+            </div>
+            <div>
+              <div style={{
+                fontSize: 16, fontWeight: 700,
+                color: r.color,
+                fontVariantNumeric: "tabular-nums",
+                marginBottom: 1,
+              }}>{r.cost}</div>
+              {r.bps && <div style={{ fontSize: 10, color: "var(--text-3)" }}>{r.bps} · {r.time}</div>}
+            </div>
+            <div style={{
+              fontSize: 13, fontWeight: 600,
+              color: r.color,
+              textAlign: "right",
+              fontVariantNumeric: "tabular-nums",
+            }}>
+              {r.vs}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function SecurityStat({ value, label, last }: { value: string; label: string; last?: boolean }) {
