@@ -152,6 +152,42 @@ export default function Landing() {
       </section>
 
       <section style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px 80px" }}>
+        <SectionLabel>Track record</SectionLabel>
+        <div style={{
+          background: "linear-gradient(135deg, #0e1d18 0%, #0a0a0d 100%)",
+          border: "1px solid rgba(109,245,178,0.25)",
+          borderRadius: "var(--radius-lg)",
+          padding: 48,
+          position: "relative",
+          overflow: "hidden",
+        }}>
+          <div style={{
+            position: "absolute", top: -120, right: -120, width: 320, height: 320,
+            background: "radial-gradient(circle, rgba(109,245,178,0.15), transparent 70%)",
+            pointerEvents: "none",
+          }} />
+          <div style={{ position: "relative", maxWidth: 760 }}>
+            <h2 style={{ fontSize: 38, fontWeight: 700, letterSpacing: "-1px", marginBottom: 16, lineHeight: 1.1 }}>
+              Zero exploits. Zero downtime.<br />
+              <span style={{ color: "var(--across-green)" }}>Zero compromise.</span>
+            </h2>
+            <p style={{ fontSize: 16, color: "var(--text-2)", lineHeight: 1.65, marginBottom: 36 }}>
+              Bridges have lost over $2.9 billion to exploits in the last four years. Across has lost none. Not luck, architecture. Users receive canonical assets, never wrapped representations. Relayers front capital and bear the transfer risk. Settlement is verified by the UMA optimistic oracle. The system stays secure with just one honest participant.
+            </p>
+            <div style={{
+              display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 0,
+              borderTop: "1px solid var(--border)",
+            }}>
+              <SecurityStat value="$35B+" label="Bridged across all chains" />
+              <SecurityStat value="0" label="Exploits since launch" />
+              <SecurityStat value="0" label="User funds ever lost" />
+              <SecurityStat value="UMA" label="Optimistic-oracle settled" last />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px 80px" }}>
         <SectionLabel>Coverage</SectionLabel>
         <h2 style={{ fontSize: 30, fontWeight: 700, letterSpacing: "-0.5px", marginBottom: 8 }}>
           Live on every chain Ring touches. Plus many more.
@@ -372,6 +408,19 @@ function FlowStep({ label, body, accent, success }: { label: string; body: strin
 
 function FlowConnector() {
   return <div style={{ marginLeft: 13.5, width: 1, height: 14, background: "var(--border)" }} />;
+}
+
+function SecurityStat({ value, label, last }: { value: string; label: string; last?: boolean }) {
+  return (
+    <div style={{ padding: "22px 8px 0", borderRight: last ? "none" : "1px solid var(--border)" }}>
+      <div style={{
+        fontSize: 28, fontWeight: 700, letterSpacing: "-0.5px",
+        color: "var(--across-green)", marginBottom: 4,
+        fontVariantNumeric: "tabular-nums",
+      }}>{value}</div>
+      <div style={{ fontSize: 11, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.7px", fontWeight: 500, lineHeight: 1.3 }}>{label}</div>
+    </div>
+  );
 }
 
 function CredCard({ label, hint, value }: { label: string; hint: string; value: string }) {

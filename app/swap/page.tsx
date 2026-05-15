@@ -343,19 +343,8 @@ function CrossChainCard() {
   })();
 
   return (
-    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: 12, position: "relative" }}>
-      <div style={{
-        position: "absolute", top: -10, right: 16,
-        background: "var(--bg)", padding: "3px 10px",
-        fontSize: 10, color: "var(--across-green)",
-        border: "1px solid rgba(109,245,178,0.25)", borderRadius: 999,
-        fontWeight: 600, letterSpacing: "0.5px",
-        display: "flex", alignItems: "center", gap: 6,
-      }}>
-        <Image src="/across-logo.png" alt="Across" width={12} height={12} style={{ borderRadius: "50%" }} />
-        POWERED BY ACROSS
-      </div>
-
+    <>
+      <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: 12, position: "relative" }}>
       <TokenBox
         label="Sell"
         chainId={sellChain}
@@ -466,6 +455,24 @@ function CrossChainCard() {
         </div>
       )}
     </div>
+
+    <div style={{
+      display: "flex", justifyContent: "center", marginTop: 14,
+    }}>
+      <div style={{
+        display: "inline-flex", alignItems: "center", gap: 8,
+        padding: "7px 14px",
+        background: "var(--bg-card)",
+        border: "1px solid rgba(109,245,178,0.25)",
+        borderRadius: 999,
+        fontSize: 11, fontWeight: 600, letterSpacing: "0.7px",
+        color: "var(--across-green)",
+      }}>
+        <Image src="/across-logo.png" alt="Across" width={14} height={14} style={{ borderRadius: "50%" }} />
+        POWERED BY ACROSS
+      </div>
+    </div>
+    </>
   );
 }
 
