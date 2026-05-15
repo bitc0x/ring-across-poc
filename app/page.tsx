@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 
 const PARTNERS = [
@@ -195,6 +196,29 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* CREDENTIALS */}
+      <section style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px 60px" }}>
+        <SectionLabel>Ready to integrate</SectionLabel>
+        <h2 style={{ fontSize: 32, fontWeight: 700, letterSpacing: "-0.5px", marginBottom: 8 }}>
+          Ring&apos;s production credentials.
+        </h2>
+        <p style={{ fontSize: 15, color: "var(--text-2)", marginBottom: 24, maxWidth: 640 }}>
+          Pre-provisioned by the Across team for Ring Protocol. Use these in any environment, from local builds to production deployments. Volume attributes back to Ring automatically.
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <CredCard
+            label="Integrator ID"
+            hint="Pass as the integratorId query parameter on every Swap API call."
+            value="0x0155"
+          />
+          <CredCard
+            label="API Key"
+            hint="Pass as a Bearer token in the Authorization header."
+            value="acx_YxiAk9cmVox9KndzY5tB_tQ42v3ZAedL"
+          />
+        </div>
+      </section>
+
       {/* CTA */}
       <section style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px 100px" }}>
         <div style={{
@@ -320,4 +344,49 @@ function FlowStep({ label, body, accent, success }: { label: string; body: strin
 
 function FlowConnector() {
   return <div style={{ marginLeft: 13.5, width: 1, height: 14, background: "var(--border)" }} />;
+}
+
+function CredCard({ label, hint, value }: { label: string; hint: string; value: string }) {
+  const [copied, setCopied] = useState(false);
+  const copy = () => {
+    navigator.clipboard.writeText(value);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+  return (
+    <div style={{
+      background: "var(--bg-card)",
+      border: "1px solid var(--border)",
+      borderRadius: "var(--radius-lg)",
+      padding: 24,
+    }}>
+      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 4, color: "var(--text)" }}>{label}</div>
+      <div style={{ fontSize: 12, color: "var(--text-3)", marginBottom: 14, lineHeight: 1.5 }}>{hint}</div>
+      <div style={{ display: "flex", gap: 10, alignItems: "stretch" }}>
+        <code style={{
+          flex: 1,
+          background: "var(--bg-elev)",
+          border: "1px solid var(--border)",
+          borderRadius: "var(--radius-sm)",
+          padding: "12px 14px",
+          fontSize: 13,
+          fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+          color: "var(--text)",
+          wordBreak: "break-all",
+          lineHeight: 1.4,
+        }}>{value}</code>
+        <button onClick={copy} style={{
+          background: copied ? "rgba(34,197,94,0.12)" : "var(--bg-elev)",
+          border: `1px solid ${copied ? "rgba(34,197,94,0.3)" : "var(--border)"}`,
+          color: copied ? "var(--success)" : "var(--text-2)",
+          borderRadius: "var(--radius-sm)",
+          padding: "0 16px",
+          fontSize: 13,
+          fontWeight: 600,
+          minWidth: 80,
+          transition: "all 0.15s",
+        }}>{copied ? "Copied" : "Copy"}</button>
+      </div>
+    </div>
+  );
 }
