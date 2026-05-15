@@ -3,7 +3,7 @@
 import "@rainbow-me/rainbowkit/styles.css";
 import { RainbowKitProvider, getDefaultConfig, darkTheme } from "@rainbow-me/rainbowkit";
 import { WagmiProvider } from "wagmi";
-import { mainnet, arbitrum, base, optimism, unichain } from "wagmi/chains";
+import { mainnet, arbitrum, base, optimism, blast } from "wagmi/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { defineChain } from "viem";
 
@@ -18,7 +18,7 @@ const hyperEVM = defineChain({
 export const config = getDefaultConfig({
   appName: "Ring x Across",
   projectId: "8e0e7e8d6e7d6c8e7e8d6e7d6c8e7e8d",
-  chains: [mainnet, arbitrum, base, optimism, unichain, hyperEVM],
+  chains: [mainnet, arbitrum, base, optimism, blast, hyperEVM],
   ssr: true,
 });
 
