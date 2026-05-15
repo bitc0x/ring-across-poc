@@ -215,7 +215,7 @@ function CrossChainCard() {
           amount: wei,
           depositor: address,
           recipient: address,
-          tradeType: "minOutput",
+          tradeType: "exactInput",
         });
         setQuote(q);
       } catch (e: any) {

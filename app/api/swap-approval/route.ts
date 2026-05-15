@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   const destinationChainId = sp.get("destinationChainId");
   const amount = sp.get("amount");
   const depositor = sp.get("depositor");
-  const tradeType = sp.get("tradeType") || "minOutput";
+  const tradeType = sp.get("tradeType") || "exactInput";
 
   if (!inputToken || !outputToken || !originChainId || !destinationChainId || !amount || !depositor) {
     return NextResponse.json({ error: "missing params" }, { status: 400 });
